@@ -18,6 +18,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import com.revrobotics.RelativeEncoder;
 
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.team7520.robot.Constants;
@@ -50,30 +51,33 @@ public class SwerveModule extends SubsystemBase {
     public SwerveModule(int steerID, int driveID, boolean invertDrive, boolean invertSteer) {
 
         //Create and configure a new Drive motor
-        driveMotor = new CANSparkMax(driveID, MotorType.kBrushless);
-        driveMotor.restoreFactoryDefaults();
-        driveMotor.setInverted(invertDrive);
-        driveMotor.setOpenLoopRampRate(RAMP_RATE);
-        driveMotor.setIdleMode(IdleMode.kCoast); //changed to break at comp
-        driveMotor.setSmartCurrentLimit(55);
+        this.driveMotor = new CANSparkMax(driveID, MotorType.kBrushless);
+        this.driveMotor.restoreFactoryDefaults();
+        this.driveMotor.setInverted(invertDrive);
+        this.driveMotor.setOpenLoopRampRate(RAMP_RATE);
+        this.driveMotor.setIdleMode(IdleMode.kBrake); //changed to break at comp
+        this.driveMotor.setSmartCurrentLimit(55);
+
+        this.driveMotorEncoder = this.driveMotor.getEncoder();
 
 
         //Create and configure an analog input on a roborio port
         //analogIn = new AnalogInput(analogNum);
 
         //Create and configure a new Steering motor
-        steerMotor = new TalonSRX(steerID);
-        steerMotor.configFactoryDefault();
-        steerMotor.configSelectedFeedbackSensor(FeedbackDevice.Analog, 0, 0);
-        steerMotor.config_kP(0, STEER_P, 0);
-        steerMotor.config_kI(0, STEER_I, 0);
-        steerMotor.config_kD(0, STEER_D, 0);
-        steerMotor.config_IntegralZone(0, 100, 0);
-        steerMotor.configAllowableClosedloopError(0, 2, 0);
-        steerMotor.setNeutralMode(NeutralMode.Brake);
-        steerMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, STATUS_FRAME_PERIOD, 0);
-        steerMotor.setInverted(invertSteer);
-        steerMotor.setSensorPhase(true);
+        this.steerMotor = new TalonSRX(steerID);
+        this.steerMotor.configFactoryDefault();
+        this.steerMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+        this.steerMotor.config_kP(0, STEER_P, 0);
+        this.steerMotor.config_kI(0, STEER_I, 0);
+        this.steerMotor.config_kD(0, STEER_D, 0);
+        this.steerMotor.config_IntegralZone(0, 100, 0);
+        this.steerMotor.configAllowableClosedloopError(0, 2, 0);
+        this.steerMotor.setNeutralMode(NeutralMode.Brake);
+        this.steerMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, STATUS_FRAME_PERIOD, 0);
+        this.steerMotor.setSensorPhase(true);
+        this.steerMotor.setSelectedSensorPosition(0);
+        this.steerMotor.setInverted(invertSteer);
 
         //Create the built-in motor encoders
 
@@ -121,7 +125,7 @@ public class SwerveModule extends SubsystemBase {
         //}
         //Add change in position to current position
         //double targetPosition = currentAngle + deltaDegrees;
-        double targetPosition = currentPosition + ((deltaDegrees/360) * encoderCountPerRotation);
+        double targetPosition = (angle * encoderCountPerRotation);
         //Scale the new position to match the motor encoder
         //double scaledPosition = (targetPosition / (360/STEER_MOTOR_RATIO));
 
@@ -130,7 +134,7 @@ public class SwerveModule extends SubsystemBase {
         //steerOutput = MathUtil.clamp(steerOutput, -1, 1); // Use for RoboRio PID
 
 
-        driveMotor.set(speed);
+        driveMotor.set(speed*0.1);
         steerMotor.set(ControlMode.Position, targetPosition);
 
 
@@ -226,6 +230,10 @@ public class SwerveModule extends SubsystemBase {
         else {
             driveMotor.setOpenLoopRampRate(0);
         }
+    }
+
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(getDriveEncoder(), getTurningPosition());
     }
 
     @Override
