@@ -170,17 +170,7 @@ public class SwerveBase extends SubsystemBase {
         double C = forward - omega;
         double D = forward + omega;
 
-        // Compute the drive motor speeds
-        // double speedFL = speed(B, D);
-        // double speedBL = speed(A, D);
-        // double speedFR = speed(B, C);
-        // double speedBR = speed(A, C);
-        double speedFL = speed(B, C);
-        double speedBL = speed(A, C);
-        double speedFR = speed(B, D);
-        double speedBR = speed(A, D);
-
-        /*
+                /*
          * ... and angles for the steering motors Set the drive to face straight ahead
          * and then either mechanically set the encoders to read zero, or mathematically
          * correct the angle by reading the encoder value when the drive is pointed
@@ -199,6 +189,17 @@ public class SwerveBase extends SubsystemBase {
         double rfOffset = rfSetAngle.getDouble(0.0);
         double rbOffset = rbSetAngle.getDouble(0.0);
 
+
+        // Compute the drive motor speeds
+        // double speedFL = speed(B, D);
+        // double speedBL = speed(A, D);
+        // double speedFR = speed(B, C);
+        // double speedBR = speed(A, C);
+        double speedFL = speed(B, C);
+        double speedBL = speed(A, C);
+        double speedFR = speed(A, D);
+        double speedBR = speed(B, D);
+        
         /*
          * When drives are mechanically calibrated for zero position on encoders they
          * can be at 90 degrees to the front of the robot. Adding or subtracting 90
@@ -216,14 +217,10 @@ public class SwerveBase extends SubsystemBase {
         // They are at 90 degrees to the front of the robot.
         // Subtract and add 90 degrees to steering calculation to offset for initial
         // position/calibration of drives.
-        double angleFL = angle(B, C);// + Constants.FL_STEER_OFFSET;//+ lfOffset;
-        double angleBL = angle(A, C);// + Constants.BL_STEER_OFFSET;// + lbOffset;
-        double angleFR = angle(B, D);// + Constants.FR_STEER_OFFSET;// + rfOffset;
-        double angleBR = angle(A, D);// + Constants.BR_STEER_OFFSET;// + rbOffset;
-        // double angleFL = angle(B, D) + Constants.FL_STEER_OFFSET + lfOffset;
-        // double angleBL = angle(A, D) + Constants.BL_STEER_OFFSET + lbOffset;
-        // double angleFR = angle(B, C) + Constants.FR_STEER_OFFSET + rfOffset;
-        // double angleBR = angle(A, C) + Constants.BR_STEER_OFFSET + rbOffset;
+        double angleFL = angle(B, C);
+        double angleBL = angle(A, C);
+        double angleFR = angle(A, D);
+        double angleBR = angle(B, D);
 
         // Compute the maximum speed so that we can scale all the speeds to the range
         // [0.0, 1.0]
