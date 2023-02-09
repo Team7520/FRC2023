@@ -199,7 +199,7 @@ public class SwerveBase extends SubsystemBase {
         double speedBL = speed(A, C);
         double speedFR = speed(A, D);
         double speedBR = speed(B, D);
-        
+
         /*
          * When drives are mechanically calibrated for zero position on encoders they
          * can be at 90 degrees to the front of the robot. Adding or subtracting 90
@@ -268,11 +268,11 @@ public class SwerveBase extends SubsystemBase {
     }
 
     private double speed(double val1, double val2) {
-        return Math.hypot(val1, val2);
+        return Math.sqrt((val1 * val1) + (val2 * val2));
     }
 
     private double angle(double val1, double val2) {
-        return (Math.atan2(val1, val2)/Math.PI)/2;
+        return (Math.atan2(val2, val1)/Math.PI+0.5)/2;
     }
 
     public double[] getDriveEncoders() {

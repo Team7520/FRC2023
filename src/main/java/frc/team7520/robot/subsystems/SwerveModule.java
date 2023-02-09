@@ -73,10 +73,10 @@ public class SwerveModule extends SubsystemBase {
         this.steerMotor.config_kD(0, STEER_D, 0);
         this.steerMotor.config_IntegralZone(0, 100, 0);
         this.steerMotor.configAllowableClosedloopError(0, 2, 0);
-        this.steerMotor.setNeutralMode(NeutralMode.Brake);
+        this.steerMotor.setNeutralMode(NeutralMode.Coast);
         this.steerMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, STATUS_FRAME_PERIOD, 0);
         this.steerMotor.setSensorPhase(true);
-        this.steerMotor.setSelectedSensorPosition(0);
+//        this.steerMotor.setSelectedSensorPosition(0);
         this.steerMotor.setInverted(invertSteer);
 
         //Create the built-in motor encoders
@@ -119,7 +119,7 @@ public class SwerveModule extends SubsystemBase {
         if (!driveCorrect){
             if (Math.abs(deltaDegrees) > 90.0) {
                 deltaDegrees -= 180.0 * Math.signum(deltaDegrees);
-                speed = -speed;
+//                speed = -speed;
             }
         }
         //}

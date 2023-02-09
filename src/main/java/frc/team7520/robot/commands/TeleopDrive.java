@@ -111,9 +111,11 @@ public class TeleopDrive extends CommandBase {
         // If all of the joysticks are in the deadzone, don't update the motors
         // This makes side-to-side strafing much smoother
         boolean deadStick = false;
-        if (strafe == 0.0 && forward == 0.0 && omega == 0.0) {
+        if (Math.abs(forward) < Constants.deadZone && Math.abs(strafe) < Constants.deadZone && Math.abs(omega) < Constants.deadZone) {
             deadStick = true;
         }
+
+        SmartDashboard.putBoolean("Dead Stick", deadStick);
 
         // SmartDashboard.putNumber("Forward Done", forward);
         // SmartDashboard.putNumber("Strafe Done", strafe);
