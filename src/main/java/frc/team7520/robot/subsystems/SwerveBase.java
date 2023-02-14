@@ -50,7 +50,7 @@ public class SwerveBase extends SubsystemBase {
     public static final double MAX_SPEED = 0.75; // Max speed is 0 to 1
     public static final double MAX_REVERSIBLE_SPEED_DIFFERENCE = 0.7 * MAX_SPEED;
 
-    public static final double OMEGA_SCALE = 1.0 / 30.0;
+    public static final double OMEGA_SCALE = 10;
 
     private final boolean invertDrive = true;//false;
     private final boolean invertSteer = true;
@@ -156,13 +156,13 @@ public class SwerveBase extends SubsystemBase {
     public void processInput(double forward, double strafe, double omega, boolean deadStick, boolean driveCorrect) {
 
         this._driveCorrect = driveCorrect;
-        double omegaL2 = omega * (WHEEL_BASE_LENGTH / 2.0);
-        //SmartDashboard.putNumber("OmegaL2", omegaL2);
-        double omegaW2 = omega * (WHEEL_BASE_WIDTH / 2.0);
-        SmartDashboard.putNumber("OmegaW2", omegaW2);
 
         SmartDashboard.putNumber("Forwrad", forward);
         SmartDashboard.putNumber("Strafe", strafe);
+
+        omega = omega * OMEGA_SCALE;
+
+        strafe = strafe;
 
         // Compute the constants used later for calculating speeds and angles
         double A = strafe - omega;
