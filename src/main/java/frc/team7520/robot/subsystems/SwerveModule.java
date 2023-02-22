@@ -104,8 +104,8 @@ public class SwerveModule extends SubsystemBase {
         //SmartDashboard.putNumber(this.driveLocation.getName()+" Current Position", currentPosition);
         double currentAngle = (currentPosition * 360.0 / this.encoderCountPerRotation) % 360.0;
         //SmartDashboard.putNumber(this.driveLocation.getName()+" Current Angle", currentAngle);
-        double targetAngle = -angle; //-angle;
-        double deltaDegrees = targetAngle - currentAngle;
+        double deltaDegrees = angle*360 - currentAngle;
+
         // If we need to turn more than 180 degrees, it's faster to turn in the opposite
         // direction
         if (Math.abs(deltaDegrees) > 180.0) {
@@ -113,19 +113,13 @@ public class SwerveModule extends SubsystemBase {
         }
 
         // If we need to turn more than 90 degrees, we can reverse the wheel direction
-        // instead and
-        // only rotate by the complement
-        //if (Math.abs(speed) <= MAX_SPEED){
-        if (!driveCorrect){
-            if (Math.abs(deltaDegrees) > 90.0) {
-                deltaDegrees -= 180.0 * Math.signum(deltaDegrees);
-//                speed = -speed;
-            }
+        if (Math.abs(deltaDegrees) > 90.0) {
+            deltaDegrees -= 180.0 * Math.signum(deltaDegrees);
+            speed = -speed;
         }
-        //}
         //Add change in position to current position
         //double targetPosition = currentAngle + deltaDegrees;
-        double targetPosition = (angle * encoderCountPerRotation);
+        double targetPosition = currentPosition + ((deltaDegrees/360) * encoderCountPerRotation);
         //Scale the new position to match the motor encoder
         //double scaledPosition = (targetPosition / (360/STEER_MOTOR_RATIO));
 
@@ -134,7 +128,7 @@ public class SwerveModule extends SubsystemBase {
         //steerOutput = MathUtil.clamp(steerOutput, -1, 1); // Use for RoboRio PID
 
 
-        driveMotor.set(speed*0.1);
+        driveMotor.set(speed*0.2);
         steerMotor.set(ControlMode.Position, targetPosition);
 
 

@@ -15,13 +15,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
-import frc.team7520.robot.subsystems.NavXGyro;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team7520.robot.Constants;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -50,7 +48,7 @@ public class SwerveBase extends SubsystemBase {
     public static final double MAX_SPEED = 0.75; // Max speed is 0 to 1
     public static final double MAX_REVERSIBLE_SPEED_DIFFERENCE = 0.7 * MAX_SPEED;
 
-    public static final double OMEGA_SCALE = 10;
+    public static final double OMEGA_SCALE = 20;
 
     private final boolean invertDrive = true;//false;
     private final boolean invertSteer = true;
@@ -65,16 +63,12 @@ public class SwerveBase extends SubsystemBase {
     //SwerveModule(int steerNum, int driveNum, boolean invertDrive, boolean invertSteer)
 
     public SwerveBase(NavXGyro gyro) {
-
         this._gyro = gyro;
 
-        swerve1 = new SwerveModule(1, 11, invertDrive, false);
-
-        swerve2 = new SwerveModule(2, 12, invertDrive, true);
-
-        swerve3 = new SwerveModule(3, 13, invertDrive, false);
-
-        swerve4 = new SwerveModule(4, 14, invertDrive, false);
+        swerve1 = Constants.SwerveConstants.swerve1;
+        swerve2 = Constants.SwerveConstants.swerve2;
+        swerve3 = Constants.SwerveConstants.swerve3;
+        swerve4 = Constants.SwerveConstants.swerve4;
 
         odometer = new SwerveDriveOdometry(Constants.kDriveKinematics,
                 new Rotation2d(0),
@@ -160,7 +154,7 @@ public class SwerveBase extends SubsystemBase {
         SmartDashboard.putNumber("Forwrad", forward);
         SmartDashboard.putNumber("Strafe", strafe);
 
-        omega = omega * OMEGA_SCALE;
+        omega = omega * (OMEGA_SCALE);
 
         strafe = strafe;
 
@@ -191,80 +185,47 @@ public class SwerveBase extends SubsystemBase {
 
 
         // Compute the drive motor speeds
-        // double speedFL = speed(B, D);
-        // double speedBL = speed(A, D);
-        // double speedFR = speed(B, C);
-        // double speedBR = speed(A, C);
-        double speedFL = speed(B, C);
-        double speedBL = speed(A, C);
-        double speedFR = speed(A, D);
-        double speedBR = speed(B, D);
-
-        /*
-         * When drives are mechanically calibrated for zero position on encoders they
-         * can be at 90 degrees to the front of the robot. Adding or subtracting 90
-         * degrees to the steering calculation can be used offset for initial
-         * position/calibration of the drives.
-         *
-         * For swerve and steer drives constants are 90 degrees out of phase when they
-         * are inserted in frames sideways. angleFL - 90 angleBL + 90 angleFR - 90
-         * angleBR + 90
-         */
-
+        double speed1 = speed(B, C);
+        double speed2 = speed(A, C);
+        double speed3 = speed(A, D);
+        double speed4 = speed(B, D);
 
         // Angles for the steering motors
         // When drives are calibrated for zero position on encoders
         // They are at 90 degrees to the front of the robot.
         // Subtract and add 90 degrees to steering calculation to offset for initial
         // position/calibration of drives.
-        double angleFL = angle(B, C);
-        double angleBL = angle(A, C);
-        double angleFR = angle(A, D);
-        double angleBR = angle(B, D);
+        double angle1 = angle(B, C);
+        double angle2 = angle(A, C);
+        double angle3 = angle(A, D);
+        double angle4 = angle(B, D);
+
+        SwerveModuleState state1 = new SwerveModuleState(speed1, new Rotation2d(angle1));
+        SwerveModuleState state2 = new SwerveModuleState(speed2, new Rotation2d(angle2));
+        SwerveModuleState state3 = new SwerveModuleState(speed3, new Rotation2d(angle3));
+        SwerveModuleState state4 = new SwerveModuleState(speed4, new Rotation2d(angle4));
+
 
         // Compute the maximum speed so that we can scale all the speeds to the range
         // [0.0, 1.0]
-        double maxSpeed = Collections.max(Arrays.asList(speedFL, speedBL, speedFR, speedBR, 1.0));
+        double maxSpeed = Collections.max(Arrays.asList(speed1, speed2, speed3, speed4, 1.0));
 
         // Set each swerve module, scaling the drive speeds by the maximum speed
 
-        SmartDashboard.putNumber("angleLF", angleFL);
-        SmartDashboard.putNumber("speedLF", speedFL);
-        SmartDashboard.putNumber("CurAngle FL", swerve1.getSteerEncDeg());
-        // SmartDashboard.putNumber("angleRF", angleFR);
-        // SmartDashboard.putNumber("speedRF", speedFR);
-        // SmartDashboard.putNumber("CurAngle FR", frontRight.getSteerEncDeg());
-        // SmartDashboard.putNumber("angleLR", angleBL);
-        // SmartDashboard.putNumber("speedLR", speedBL);
-        // SmartDashboard.putNumber("CurAngle BL", backLeft.getSteerEncDeg());
-        // SmartDashboard.putNumber("angleRR", angleBR);
-        // SmartDashboard.putNumber("speedRR", speedBR);
-        // SmartDashboard.putNumber("CurAngle BR", backRight.getSteerEncDeg());
-        // SmartDashboard.putNumber("SpeedLF/MaxSpeed", speedFL / maxSpeed);
         if (deadStick) {
 
-            // frontLeft.setSteerSpeed(0);
-            swerve1.setDriveSpeed(0);
-            // backLeft.setSteerSpeed(0);
-            swerve2.setDriveSpeed(0);
-            // frontRight.setSteerSpeed(0);
-            swerve3.setDriveSpeed(0);
-            // backRight.setSteerSpeed(0);
-            swerve4.setDriveSpeed(0);
+            swerve1.stop();
+            swerve2.stop();
+            swerve3.stop();
+            swerve4.stop();
 
         } else {
-
             // Set each swerve module, scaling the drive speeds by the maximum speed
-            swerve1.setSwerve(angleFL, speedFL / maxSpeed, this._driveCorrect);
-            swerve2.setSwerve(angleBL, speedBL / maxSpeed, this._driveCorrect);
-            swerve3.setSwerve(angleFR, speedFR / maxSpeed, this._driveCorrect);
-            swerve4.setSwerve(angleBR, speedBR / maxSpeed, this._driveCorrect);
+            swerve1.setSwerve(angle1, speed1, this._driveCorrect);
+            swerve2.setSwerve(angle2, speed2, this._driveCorrect);
+            swerve3.setSwerve(angle3, speed4, this._driveCorrect);
+            swerve4.setSwerve(angle4, speed4, this._driveCorrect);
         }
-        // this.FL_Drive.setAngleAndSpeed(angleLF, speedLF / maxSpeed);
-        // this.BL_Drive.setAngleAndSpeed(angleLR, speedLR / maxSpeed);
-        // this.FR_Drive.setAngleAndSpeed(angleRF, speedRF / maxSpeed);
-        // this.BR_Drive.setAngleAndSpeed(angleRR, speedRR / maxSpeed);
-        //getSteerEncoderVal();
     }
 
     private double speed(double val1, double val2) {
@@ -303,13 +264,6 @@ public class SwerveBase extends SubsystemBase {
         swerve2.setDriveEncoder(position);
         swerve3.setDriveEncoder(position);
         swerve4.setDriveEncoder(position);
-    }
-
-    public void getSteerEncoderVal(){
-        SmartDashboard.putNumber("angleLF", swerve1.getSteerEncoder());
-        SmartDashboard.putNumber("angleLB", swerve2.getSteerEncoder());
-        SmartDashboard.putNumber("angleRF", swerve3.getSteerEncoder());
-        SmartDashboard.putNumber("angleRB", swerve4.getSteerEncoder());
     }
 
     // public static double[] getEncoderVal() {
