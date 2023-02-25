@@ -23,7 +23,7 @@ public class TeleopDrive extends CommandBase {
     double stickStrafe;
     double stickRotate;
 
-    public static final double OMEGA_SCALE = 1.0 / 45.0;//30
+    public static final double OMEGA_SCALE = 1/1.5d;
     public static final double DEADZONE_LSTICK = 0.07;
     private static final double DEADZONE_RSTICK = 0.07;
     private double originHeading = 0.0;
@@ -62,18 +62,9 @@ public class TeleopDrive extends CommandBase {
     @Override
     public void execute() {
 
-        final double originOffset = 360 - originHeading;
-        //originCorr = _navXGyro.getNavAngle() + originOffset;
-
-        // double stickForward = this.swerveBaseController.getLeftY();
         stickForward = Math.abs(this.swerveBaseController.getLeftY()) > Constants.deadZone ? this.swerveBaseController.getLeftY() : 0d;
-        SmartDashboard.putNumber("Controller Forward", stickForward);
-        // double stickStrafe = this.swerveBaseController.getLeftX();
         stickStrafe = Math.abs(this.swerveBaseController.getLeftX()) > Constants.deadZone ? this.swerveBaseController.getLeftX() : 0d;
-        //SmartDashboard.putNumber("Controller Strafe", stickStrafe);
-        // double stickOmega = (this.swerveBaseController.getRightX());
         stickRotate = Math.abs(this.swerveBaseController.getRightX()) > Constants.deadZone ? this.swerveBaseController.getRightX() : 0d;
-        //SmartDashboard.putNumber("Controller Omega", stickOmega);
 
         double strafe = Math.pow(Math.abs(stickStrafe), leftPow) * Math.signum(stickStrafe);
         double forward = Math.pow(Math.abs(stickForward), leftPow) * Math.signum(stickForward);
@@ -89,8 +80,6 @@ public class TeleopDrive extends CommandBase {
         boolean swerveBaseCorrect = swerveBaseController.getRightBumper();
 
         if (!stickFieldCentric) {
-            // When the Left Joystick trigger is not pressed, The robot is in Field Centric
-            // Mode.
             // The calculations correct the forward and strafe values for field centric
             // attitude.
 
@@ -99,10 +88,6 @@ public class TeleopDrive extends CommandBase {
             // final double originCorrection = Math.toRadians(originHeading - Navx.getInstance().navX.getFusedHeading());
             // final double temp = forward * Math.cos(originCorrection) - strafe * Math.sin(originCorrection);
             final double originCorrection = Math.toRadians(originHeading - _navXGyro.getNavAngle());
-            //final double originCorrection = Math.toRadians(originHeading - _navXGyro.getNavHeading());
-            // final double temp = forward * Math.cos(originCorrection) - strafe * Math.sin(originCorrection);
-            // strafe = strafe * Math.cos(originCorrection) + forward * Math.sin(originCorrection);
-            // forward = temp;
             final double temp = forward * Math.cos(originCorrection) + strafe * Math.sin(originCorrection);
             strafe = strafe * Math.cos(originCorrection) - forward * Math.sin(originCorrection);
             forward = temp;

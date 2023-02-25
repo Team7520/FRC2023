@@ -48,8 +48,6 @@ public class SwerveBase extends SubsystemBase {
     public static final double MAX_SPEED = 0.75; // Max speed is 0 to 1
     public static final double MAX_REVERSIBLE_SPEED_DIFFERENCE = 0.7 * MAX_SPEED;
 
-    public static final double OMEGA_SCALE = 20;
-
     private final boolean invertDrive = true;//false;
     private final boolean invertSteer = true;
     private NavXGyro _gyro;
@@ -154,7 +152,7 @@ public class SwerveBase extends SubsystemBase {
         SmartDashboard.putNumber("Forwrad", forward);
         SmartDashboard.putNumber("Strafe", strafe);
 
-        omega = omega * (OMEGA_SCALE);
+        omega = omega;
 
         strafe = strafe;
 
