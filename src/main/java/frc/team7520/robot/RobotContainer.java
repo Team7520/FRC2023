@@ -6,12 +6,12 @@
 package frc.team7520.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.team7520.robot.Constants.OperatorConstants;
 import frc.team7520.robot.commands.TeleopDrive;
-import frc.team7520.robot.subsystems.SwerveBase;
+import frc.team7520.robot.subsystems.Arm;
+import frc.team7520.robot.subsystems.Hand;
 import frc.team7520.robot.subsystems.NavXGyro;
 import frc.team7520.robot.subsystems.SwerveModule;
 import com.revrobotics.CANSparkMax;
@@ -33,8 +33,8 @@ public class RobotContainer
     public static final SwerveModule swerve2 = new SwerveModule(2, 12, Constants.SwerveConstants.invertDrive, true);
     public static final SwerveModule swerve3 = new SwerveModule(3, 13, Constants.SwerveConstants.invertDrive, true);
     public static final SwerveModule swerve4 = new SwerveModule(4, 14, Constants.SwerveConstants.invertDrive, false);
-    public static final CANSparkMax NeoMotor500 = new CANSparkMax(40,CANSparkMaxLowLevel.MotorType.kBrushless);
-    public static final CANSparkMax NeoMotor550 = new CANSparkMax(41,CANSparkMaxLowLevel.MotorType.kBrushless);
+    public static final CANSparkMax armMotor = new CANSparkMax(40,CANSparkMaxLowLevel.MotorType.kBrushless);
+    public static final CANSparkMax elbowMotor = new CANSparkMax(41,CANSparkMaxLowLevel.MotorType.kBrushless);
     public static final DigitalInput input = new DigitalInput(0);
     public static final DigitalInput photoSwitch = new DigitalInput(1);
     // The robot's subsystems and commands are defined here...
@@ -42,10 +42,14 @@ public class RobotContainer
     private final NavXGyro _navXGyro = new NavXGyro();
     public final TeleopDrive TeleopDrive = new TeleopDrive(new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT), _navXGyro);
 
+
+    public final Arm arm = Arm.getInstance();
+
+
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final CommandXboxController driverController =
-            new CommandXboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
-    private final CommandXboxController operatorController =
+    public static final XboxController driverController =
+            new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
+    public final CommandXboxController operatorController =
             new CommandXboxController(OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */

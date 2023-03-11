@@ -1,29 +1,27 @@
 package frc.team7520.robot.subsystems;
 
+import com.revrobotics.SparkMaxPIDController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj.DigitalInput;
-import java.util.*;
 import frc.team7520.robot.RobotContainer;
-import frc.team7520.robot.Constants;
 
 public class Arm extends SubsystemBase {
 
-    public static final CANSparkMax NeoMotor500 = RobotContainer.NeoMotor500;
-    public static final CANSparkMax NeoMotor550 = RobotContainer.NeoMotor550;
+    public static final CANSparkMax armMotor = RobotContainer.armMotor;
+    public static final CANSparkMax elbowMotor = RobotContainer.elbowMotor;
     public static final DigitalInput input = RobotContainer.input;
     public static final DigitalInput photoSwitch = RobotContainer.photoSwitch;
-    
+    private final SparkMaxPIDController armPID;
+    private final SparkMaxPIDController elbowPID;
 
-    private RelativeEncoder m_encoder550;
-    private RelativeEncoder m_encoder500;
+
+    private RelativeEncoder elbowEncoder;
+    private RelativeEncoder armNeoEncoder;
 
     private static double speedMultiplierS = 1;
     private static double speedMultiplierE = 1;
@@ -38,13 +36,13 @@ public class Arm extends SubsystemBase {
     private static double elbowPosition, elbowSpeed;
     private static final int SET_SHOULDER = 150;
     private static final int SET_EBLOW = 10;
-    
+
     private static boolean calibrated = false;
     private static boolean calibrated_E = false;
     private static boolean fullCalibration = false;
     private static boolean armPlace;
-    
-    
+
+
 
     // With eager singleton initialization, any static variables/fields used in the
     // constructor must appear before the "INSTANCE" variable so that they are initialized
@@ -73,26 +71,42 @@ public class Arm extends SubsystemBase {
      * the {@link #getInstance()} method to get the singleton instance.
      */
     private Arm() {
-        m_encoder550= NeoMotor550.getEncoder();
-        m_encoder550.setPosition(0);
-        m_encoder500= NeoMotor500.getEncoder();
-        m_encoder500.setPosition(0);
+        this.elbowEncoder = elbowMotor.getEncoder();
+        this.elbowEncoder.setPosition(0);
+        this.armNeoEncoder = armMotor.getEncoder();
+        this.armNeoEncoder.setPosition(0);
+
+        this.armPID = armMotor.getPIDController();
+        this.elbowPID = elbowMotor.getPIDController();
+
+        elbowPID.setOutputRange(-1,1);
+        armPID.setOutputRange(-1,1);
+
+        elbowPID.setP(1);
+        elbowPID.setI(0);
+        elbowPID.setD(0);
+        elbowPID.setFF(0.000156);
+
+        armPID.setP(0.0001);
+        armPID.setI(0);
+        armPID.setD(0);
+        armPID.setFF(1);
+
+        elbowPID.setOutputRange(-1,1);
+        armPID.setOutputRange(-1,1);
 
     }
 
-    public boolean cube() {
-        boolean complete = setArmPosition(46, 64);
-        return complete; //true = complete, false = incomplete
+    public void cube() {
+        setArmPosition(46, 64);
     }
 
-    public boolean cone() {
-        boolean complete = setArmPosition(25, 73);
-        return complete;
+    public void cone() {
+        setArmPosition(25, 73);
     }
 
-    public boolean rest() {
-        boolean complete = setArmPosition(121, 26);
-        return complete;
+    public void rest() {
+        setArmPosition(121, 26);
     }
 
     // public boolean floor() {
@@ -102,118 +116,77 @@ public class Arm extends SubsystemBase {
     // }
 
     public boolean calibrate() {
-        if (calibrated && calibrated_E) { 
+        if (calibrated && calibrated_E) {
             fullCalibration = true;
           }
 
-          if(!fullCalibration) { 
+          if(!fullCalibration) {
 
             if (!calibrated) { //If shoulder is not callibrated
-              NeoMotor500.set(0.035);
+              armMotor.set(0.035);
               if(!input.get()) { //When upper arm hits the switch
-                m_encoder500.setPosition(SET_SHOULDER); //Set this position as base position, all calculations based here
+                armNeoEncoder.setPosition(SET_SHOULDER); //Set this position as base position, all calculations based here
                 calibrated = true;
-              } 
+              }
 
             } else {
-              NeoMotor500.set(-0.001); //Freeze upper arm
+              armMotor.set(-0.001); //Freeze upper arm
               if(!calibrated_E) {
-                NeoMotor550.set(-0.022); //start calibrating lower arm
+                elbowMotor.set(-0.022); //start calibrating lower arm
                 if(!photoSwitch.get()) { //When photoswitch detects a reflection
-                  m_encoder550.setPosition(SET_EBLOW); //Set base position for lower
+                  elbowEncoder.setPosition(SET_EBLOW); //Set base position for lower
                   calibrated_E = true;
-                } 
+                }
               }
             }
           }
           return fullCalibration;
     }
 
-    public void manual(double leftStick, double rightStick) { //God mode, joy stick control. CHECK IF JOYSTICK IS INVERTED
-        if(leftStick < -0.15) {  //If joystick holds UP
-            if(shoulderPosition < 19) { //When arm bypasses the upper LIMIT zone, STOP
-              NeoMotor500.set(neo500rest); 
-            } else if (shoulderPosition < 29 && shoulderPosition > 19){ //WHen arm enters BUFFER zone, slow down
-              NeoMotor500.set(leftStick/8);
-            } else { //If not in the buffer nor limit zone, move at a casual speed
-              NeoMotor500.set(leftStick/4);
-            }
+    public Command manual(double leftStick, double rightStick) { //God mode, joy stick control. CHECK IF JOYSTICK IS INVERTED
+          return this.runOnce(() -> {
+              if(leftStick < -0.15) {  //If joystick holds UP
+                  if(shoulderPosition < 19) { //When arm bypasses the upper LIMIT zone, STOP
+                      armMotor.set(neo500rest);
+                  } else if (shoulderPosition < 29 && shoulderPosition > 19){ //WHen arm enters BUFFER zone, slow down
+                      armMotor.set(leftStick/8);
+                  } else { //If not in the buffer nor limit zone, move at a casual speed
+                      armMotor.set(leftStick/4);
+                  }
 
-          } else if(leftStick > 0.15) { //If joystick holds DOWN
-            if (shoulderPosition > 140) { //When arm bypasses lower LIMIT zone, STOP
-              NeoMotor500.set(neo500rest);
-            } else if (shoulderPosition < 140 && shoulderPosition > 130){ //When arm enters BUFFER zone, slow down
-              NeoMotor500.set(leftStick / 8);
-            } else { //When neither in buffer nor limit zone, move at casual speed
-              NeoMotor500.set(leftStick / 4); 
-            }
+              } else if(leftStick > 0.15) { //If joystick holds DOWN
+                  if (shoulderPosition > 140) { //When arm bypasses lower LIMIT zone, STOP
+                      armMotor.set(neo500rest);
+                  } else if (shoulderPosition < 140 && shoulderPosition > 130){ //When arm enters BUFFER zone, slow down
+                      armMotor.set(leftStick / 8);
+                  } else { //When neither in buffer nor limit zone, move at casual speed
+                      armMotor.set(leftStick / 4);
+                  }
 
-          } else { //If joystick is not touched, feedforward
-            NeoMotor500.set(neo550rest); 
-          }
+              } else { //If joystick is not touched, feedforward
+                  armMotor.set(neo550rest);
+              }
 
-          if(Math.abs(rightStick) > 0.15) { //for lower arm, there are NO LIMITE nor BUFFER zones
-            NeoMotor550.set(rightStick / 8);
-          } else {
-            NeoMotor550.set(neo550rest); //Feedforward lower arm
-          }
+              if(Math.abs(rightStick) > 0.15) { //for lower arm, there are NO LIMITE nor BUFFER zones
+                  elbowMotor.set(rightStick / 8);
+              } else {
+                  elbowMotor.set(neo550rest); //Feedforward lower arm
+              }
+          });
     }
 
-    public boolean setArmPosition(double upperArm, double lowerArm) { //Auto positioning
-        double upperShoulderRange = upperArm+3; //The range of acceptable positions for upper
-        double lowerShoulderRange = upperArm-3;
-        double upperElbowRange = lowerArm+3; //The range of acceptable positions for lower
-        double lowerElbowRange = lowerArm-3;
+    public void setArmPosition(double arm, double elbow) { //Auto positioning
+        double upperShoulderRange = arm+3; //The range of acceptable positions for upper
+        double lowerShoulderRange = arm-3;
+        double upperElbowRange = elbow+3; //The range of acceptable positions for lower
+        double lowerElbowRange = elbow-3;
         double slowdownRange = 20; //Buffer zone range for slowing down
-        
 
-        if (Math.abs(shoulderPosition - upperArm) > slowdownRange){ //When outside buffer zone, fast speed
-            speedMultiplierS = 2;
-        } else { //If inside buffer, slow down
-            speedMultiplierS = 1;
-        }
-        if (Math.abs(elbowPosition - lowerArm) > slowdownRange){ 
-            speedMultiplierE = 2;
-        } else { 
-            speedMultiplierE = 1;
-        }
+        elbowPID.setReference(elbow, CANSparkMax.ControlType.kPosition);
+        armPID.setReference(arm, CANSparkMax.ControlType.kPosition);
 
-        if (shoulderPosition < lowerShoulderRange) { //When above wanted value
-            NeoMotor500.set(neo500down);
-            armPlace = false;
-        } else if (shoulderPosition > upperShoulderRange) { //when below wanted value
-            NeoMotor500.set(neo500up);
-            armPlace = false;
-        } else { //when in position range
-            NeoMotor500.set(neo500rest); 
-            armPlace = true; //activate lower arm
-        }
-
-        if (armPlace) { //when big arm is position, lower arm
-            if (elbowPosition < lowerElbowRange) {
-                NeoMotor550.set(neo550down);
-            } else if (elbowPosition > upperElbowRange) {
-                NeoMotor550.set(neo550up);
-            } else {
-                NeoMotor550.set(neo550rest);
-                return true;
-                
-            }
-
-        } else { //before big arm is not positioned, bring lower arm up to prevent crashing into other objects
-            if (elbowPosition < 23) {
-                NeoMotor550.set(neo550down);
-            } else if (elbowPosition > 29) {
-                NeoMotor550.set(neo550up);
-            } else {
-                NeoMotor550.set(neo550rest);
-                
-            }
-        }
-        return false;
-    
     }
-    
+
     @Override
     public void periodic() {
         neo500up = -0.2 * speedMultiplierS;
@@ -230,13 +203,13 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Neo550down Speed", neo550down);
 
 
-        elbowPosition = m_encoder550.getPosition();
-        elbowSpeed = m_encoder550.getVelocity();
+        elbowPosition = elbowEncoder.getPosition();
+        elbowSpeed = elbowEncoder.getVelocity();
         SmartDashboard.putNumber("ForeArm Position", elbowPosition);
         SmartDashboard.putNumber("ForeArm Speed", elbowSpeed);
 
-        shoulderPosition = m_encoder500.getPosition();
-        shoulderSpeed = m_encoder500.getVelocity();
+        shoulderPosition = armNeoEncoder.getPosition();
+        shoulderSpeed = armNeoEncoder.getVelocity();
         SmartDashboard.putNumber("Arm Position", shoulderPosition);
         SmartDashboard.putNumber("Arm Speed", shoulderSpeed);
 

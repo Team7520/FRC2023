@@ -37,10 +37,10 @@ public class Hand extends SubsystemBase {
      * the {@link #getInstance()} method to get the singleton instance.
      */
     private Hand() {
-        servo0 = new Servo(0);
-        servo1 = new Servo(1);
-        servo2 = new Servo(2);
-        servo3 = new Servo(3);
+        this.servo0 = new Servo(0);
+        this.servo1 = new Servo(1);
+        this.servo2 = new Servo(2);
+        this.servo3 = new Servo(3);
     }
 
     public void openHand(){
@@ -50,14 +50,14 @@ public class Hand extends SubsystemBase {
         servo1.set(1-topFinger);
         servo2.set(bottomFinger);
         servo3.set(1-bottomFinger);
-        
-       
-  
+
+
+
 
     }
 
     public void closeHand(){
-                
+
         topFinger =0.3;
         bottomFinger = 0.3;
         servo0.set(topFinger);
@@ -65,7 +65,7 @@ public class Hand extends SubsystemBase {
         servo2.set(bottomFinger);
         servo3.set(1-bottomFinger);
     }
-    
+
     @Override
     public void periodic() {
         SmartDashboard.putNumber("topFinger", topFinger);
