@@ -3,10 +3,12 @@ package frc.team7520.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.*;
 
 public class Hand extends SubsystemBase {
 
     private Servo servo0, servo1, servo2, servo3;
+    static double topFinger, bottomFinger;
 
     // With eager singleton initialization, any static variables/fields used in the
     // constructor must appear before the "INSTANCE" variable so that they are initialized
@@ -42,11 +44,32 @@ public class Hand extends SubsystemBase {
     }
 
     public void openHand(){
+        topFinger = 0.3 + 0.15;
+        bottomFinger = 0.3 + 0.15;
+        servo0.set(topFinger);
+        servo1.set(1-topFinger);
+        servo2.set(bottomFinger);
+        servo3.set(1-bottomFinger);
+        
+       
+  
 
     }
 
     public void closeHand(){
-
+                
+        topFinger =0.3;
+        bottomFinger = 0.3;
+        servo0.set(topFinger);
+        servo1.set(1-topFinger);
+        servo2.set(bottomFinger);
+        servo3.set(1-bottomFinger);
+    }
+    
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("topFinger", topFinger);
+        SmartDashboard.putNumber("bottomFinger", bottomFinger);
     }
 }
 
