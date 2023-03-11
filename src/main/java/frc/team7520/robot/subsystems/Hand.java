@@ -1,9 +1,12 @@
 package frc.team7520.robot.subsystems;
 
 
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hand extends SubsystemBase {
+
+    private Servo servo0, servo1, servo2, servo3;
 
     // With eager singleton initialization, any static variables/fields used in the
     // constructor must appear before the "INSTANCE" variable so that they are initialized
@@ -32,6 +35,17 @@ public class Hand extends SubsystemBase {
      * the {@link #getInstance()} method to get the singleton instance.
      */
     private Hand() {
+        servo0 = new Servo(0);
+        servo1 = new Servo(1);
+        servo2 = new Servo(2);
+        servo3 = new Servo(3);
+    }
+
+    public void openHand(){
+
+    }
+
+    public void closeHand(){
 
     }
 }
