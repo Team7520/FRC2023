@@ -7,7 +7,6 @@ package frc.team7520.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import frc.team7520.robot.subsystems.SwerveModule;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -38,10 +37,5 @@ public final class Constants
     public static class SwerveConstants
     {
         public static final boolean invertDrive = false;
-
-        public static final SwerveModule swerve1 = new SwerveModule(1, 11, invertDrive, false);
-        public static final SwerveModule swerve2 = new SwerveModule(2, 12, invertDrive, true);
-        public static final SwerveModule swerve3 = new SwerveModule(3, 13, invertDrive, true);
-        public static final SwerveModule swerve4 = new SwerveModule(4, 14, invertDrive, false);
     }
 }

@@ -35,7 +35,7 @@ public class SwerveModule extends SubsystemBase {
 
     public double currentPosition;
     private TalonSRX steerMotor;
-    private CANSparkMax driveMotor;
+    public CANSparkMax driveMotor;
     private static final double RAMP_RATE = 0.5;//1.5;
 
     //Use the following two line if using PID in RoboRIO
@@ -59,6 +59,7 @@ public class SwerveModule extends SubsystemBase {
         this.driveMotor.setSmartCurrentLimit(55);
 
         this.driveMotorEncoder = this.driveMotor.getEncoder();
+        this.driveMotorEncoder.setPosition(0);
 
 
         //Create and configure an analog input on a roborio port
@@ -86,6 +87,13 @@ public class SwerveModule extends SubsystemBase {
 //        driveMotorEncoder.setVelocityConversionFactor(Constants.ModuleConstants.kDriveEncoderRPM2MeterPerSec);
 //        driveMotor.burnFlash();
         resetEncoders();
+
+        this.driveMotor.getPIDController().setP(1);
+        this.driveMotor.getPIDController().setI(0);
+        this.driveMotor.getPIDController().setD(0);
+        this.driveMotor.getPIDController().setIZone(0);
+        this.driveMotor.getPIDController().setFF(0);
+        this.driveMotor.getPIDController().setOutputRange(1, -1);
 
     }
 

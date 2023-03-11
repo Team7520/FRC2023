@@ -23,6 +23,7 @@ import frc.team7520.robot.Constants;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.team7520.robot.RobotContainer;
 
 public class SwerveBase extends SubsystemBase {
 
@@ -63,10 +64,10 @@ public class SwerveBase extends SubsystemBase {
     public SwerveBase(NavXGyro gyro) {
         this._gyro = gyro;
 
-        swerve1 = Constants.SwerveConstants.swerve1;
-        swerve2 = Constants.SwerveConstants.swerve2;
-        swerve3 = Constants.SwerveConstants.swerve3;
-        swerve4 = Constants.SwerveConstants.swerve4;
+        swerve1 = RobotContainer.swerve1;
+        swerve2 = RobotContainer.swerve2;
+        swerve3 = RobotContainer.swerve3;
+        swerve4 = RobotContainer.swerve4;
 
         odometer = new SwerveDriveOdometry(Constants.kDriveKinematics,
                 new Rotation2d(0),

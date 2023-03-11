@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.team7520.robot.autos.MoveBackAprilTagCommand;
+import frc.team7520.robot.autos.MoveBackCommand;
 import frc.team7520.robot.subsystems.SwerveModule;
 
 
@@ -68,6 +70,9 @@ public class Robot extends TimedRobot
     @Override
     public void autonomousInit()
     {
+        MoveBackCommand moveBackCommand = new MoveBackCommand();
+        MoveBackAprilTagCommand moveBackAprilTagCommand = new MoveBackAprilTagCommand(1);
+        moveBackAprilTagCommand.schedule();
     }
 
 
