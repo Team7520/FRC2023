@@ -34,7 +34,7 @@ public class SwerveModule extends SubsystemBase {
      */
 
     public double currentPosition;
-    private TalonSRX steerMotor;
+    public TalonSRX steerMotor;
     public CANSparkMax driveMotor;
     private static final double RAMP_RATE = 0.5;//1.5;
 
@@ -121,9 +121,11 @@ public class SwerveModule extends SubsystemBase {
         }
 
         // If we need to turn more than 90 degrees, we can reverse the wheel direction
-        if (Math.abs(deltaDegrees) > 90.0) {
-            deltaDegrees -= 180.0 * Math.signum(deltaDegrees);
-            speed = -speed;
+        if(driveCorrect){
+            if (Math.abs(deltaDegrees) > 90.0) {
+                deltaDegrees -= 180.0 * Math.signum(deltaDegrees);
+                speed = -speed;
+            }
         }
         //Add change in position to current position
         //double targetPosition = currentAngle + deltaDegrees;
@@ -136,7 +138,7 @@ public class SwerveModule extends SubsystemBase {
         //steerOutput = MathUtil.clamp(steerOutput, -1, 1); // Use for RoboRio PID
 
 
-        driveMotor.set(speed*0.2);
+        driveMotor.set(speed*0.6);
         steerMotor.set(ControlMode.Position, targetPosition);
 
 

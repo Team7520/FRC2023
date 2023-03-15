@@ -98,6 +98,14 @@ public class SwerveBase extends SubsystemBase {
         return instance;
     }
 
+    public static SwerveBase getInstance() {
+        if (instance == null){
+            throw new Error();
+        }
+
+        return instance;
+    }
+
     public void stopFrontLeft() {
         swerve1.stopDriveMotor();
     }

@@ -33,7 +33,7 @@ public class TeleopDrive extends CommandBase {
 
     /** Creates a new SwerveBase. */
     public TeleopDrive(XboxController swerveBaseController, NavXGyro gyro) {
-        this._swerveBase = new SwerveBase(gyro);
+        this._swerveBase = SwerveBase.getInstance(gyro);
         this.swerveBaseController = swerveBaseController;
         this._navXGyro = gyro;
 
@@ -42,7 +42,7 @@ public class TeleopDrive extends CommandBase {
     }
 
     public TeleopDrive(Joystick leftStick, Joystick rightStick, NavXGyro gyro) {
-        this._swerveBase = new SwerveBase(gyro);
+        this._swerveBase = SwerveBase.getInstance(gyro);
         this.leftStick = leftStick;
         this.rightStick = rightStick;
         this._navXGyro = gyro;
@@ -77,7 +77,7 @@ public class TeleopDrive extends CommandBase {
         if (Math.abs(omega) < DEADZONE_RSTICK * OMEGA_SCALE)
             omega = 0.0;
         boolean stickFieldCentric = swerveBaseController.getLeftBumper();
-        boolean swerveBaseCorrect = swerveBaseController.getRightBumper();
+        boolean swerveBaseCorrect = true;
 
         if (!stickFieldCentric) {
             // The calculations correct the forward and strafe values for field centric

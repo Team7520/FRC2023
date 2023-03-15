@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.team7520.robot.Constants.OperatorConstants;
 import frc.team7520.robot.commands.TeleopDrive;
 import frc.team7520.robot.subsystems.Arm;
-import frc.team7520.robot.subsystems.Hand;
 import frc.team7520.robot.subsystems.NavXGyro;
 import frc.team7520.robot.subsystems.SwerveModule;
 import com.revrobotics.CANSparkMax;
@@ -31,7 +30,7 @@ public class RobotContainer
 {
     public static final SwerveModule swerve1 = new SwerveModule(1, 11, Constants.SwerveConstants.invertDrive, false);
     public static final SwerveModule swerve2 = new SwerveModule(2, 12, Constants.SwerveConstants.invertDrive, true);
-    public static final SwerveModule swerve3 = new SwerveModule(3, 13, Constants.SwerveConstants.invertDrive, true);
+    public static final SwerveModule swerve3 = new SwerveModule(3, 13, Constants.SwerveConstants.invertDrive, false);
     public static final SwerveModule swerve4 = new SwerveModule(4, 14, Constants.SwerveConstants.invertDrive, false);
     public static final CANSparkMax armMotor = new CANSparkMax(40,CANSparkMaxLowLevel.MotorType.kBrushless);
     public static final CANSparkMax elbowMotor = new CANSparkMax(41,CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -39,8 +38,8 @@ public class RobotContainer
     public static final DigitalInput photoSwitch = new DigitalInput(1);
     // The robot's subsystems and commands are defined here...
 
-    private final NavXGyro _navXGyro = new NavXGyro();
-    public final TeleopDrive TeleopDrive = new TeleopDrive(new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT), _navXGyro);
+    public static final NavXGyro _navXGyro = new NavXGyro();
+    public final TeleopDrive teleopDrive = new TeleopDrive(new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT), _navXGyro);
 
 
     public final Arm arm = Arm.getInstance();

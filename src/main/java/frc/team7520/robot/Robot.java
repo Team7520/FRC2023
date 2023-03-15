@@ -6,12 +6,10 @@
 package frc.team7520.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.team7520.robot.autos.MoveBackAprilTagCommand;
 import frc.team7520.robot.autos.MoveBackCommand;
-import frc.team7520.robot.subsystems.SwerveModule;
 
 
 /**
@@ -65,14 +63,15 @@ public class Robot extends TimedRobot
     @Override
     public void disabledPeriodic() {}
 
+    MoveBackCommand moveBackCommand = new MoveBackCommand();
+    MoveBackAprilTagCommand moveBackAprilTagCommand = new MoveBackAprilTagCommand(1);
+
 
     /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
     @Override
     public void autonomousInit()
-    {
-        MoveBackCommand moveBackCommand = new MoveBackCommand();
-        MoveBackAprilTagCommand moveBackAprilTagCommand = new MoveBackAprilTagCommand(1);
-        moveBackAprilTagCommand.schedule();
+    {;
+        moveBackCommand.schedule();
     }
 
 
@@ -90,9 +89,9 @@ public class Robot extends TimedRobot
         // teleop starts running. If you want the autonomous to
         // continue until interrupted by another command, remove
         // this line or comment it out.
-        if (autonomousCommand != null)
+        if (moveBackCommand != null)
         {
-            autonomousCommand.cancel();
+            moveBackCommand.cancel();
         }
     }
 
@@ -101,8 +100,12 @@ public class Robot extends TimedRobot
     @Override
     public void teleopPeriodic() {
 
-        CommandScheduler.getInstance().schedule(robotContainer.TeleopDrive);
+        CommandScheduler.getInstance().schedule(robotContainer.teleopDrive);
         CommandScheduler.getInstance().schedule(robotContainer.arm.manual(RobotContainer.driverController.getLeftY(), RobotContainer.driverController.getRightY()));
+
+        if(RobotContainer.driverController.getAButton()){
+            RobotContainer._navXGyro.resetGyro();
+        }
 
     }
 
