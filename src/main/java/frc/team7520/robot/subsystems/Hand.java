@@ -2,6 +2,7 @@ package frc.team7520.robot.subsystems;
 
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 
@@ -43,27 +44,20 @@ public class Hand extends SubsystemBase {
         this.servo3 = new Servo(3);
     }
 
-    public void openHand(){
-        topFinger = 0.3 + 0.15;
-        bottomFinger = 0.3 + 0.15;
-        servo0.set(topFinger);
-        servo1.set(1-topFinger);
-        servo2.set(bottomFinger);
-        servo3.set(1-bottomFinger);
-
-
-
-
+    public Command openHand(){
+        return runOnce( () -> {
+            topFinger = 0.2;
+            servo0.set(topFinger);
+            servo1.set(1 - topFinger);
+        });
     }
 
-    public void closeHand(){
-
-        topFinger =0.3;
-        bottomFinger = 0.3;
-        servo0.set(topFinger);
-        servo1.set(1-topFinger);
-        servo2.set(bottomFinger);
-        servo3.set(1-bottomFinger);
+    public Command closeHand(){
+        return runOnce( () -> {
+            topFinger = 0.57;
+            servo0.set(topFinger);
+            servo1.set(1 - topFinger);
+        });
     }
 
     @Override

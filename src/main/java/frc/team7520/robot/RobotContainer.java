@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.team7520.robot.Constants.OperatorConstants;
 import frc.team7520.robot.commands.TeleopDrive;
 import frc.team7520.robot.subsystems.Arm;
+import frc.team7520.robot.subsystems.Hand;
 import frc.team7520.robot.subsystems.NavXGyro;
 import frc.team7520.robot.subsystems.SwerveModule;
 import com.revrobotics.CANSparkMax;
@@ -38,12 +39,8 @@ public class RobotContainer
     public static final DigitalInput photoSwitch = new DigitalInput(1);
     // The robot's subsystems and commands are defined here...
 
-    public static final NavXGyro _navXGyro = new NavXGyro();
+    public static final NavXGyro _navXGyro = NavXGyro.getInstance();
     public final TeleopDrive teleopDrive = new TeleopDrive(new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT), _navXGyro);
-
-
-    public final Arm arm = Arm.getInstance();
-
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     public static final XboxController driverController =
@@ -71,6 +68,24 @@ public class RobotContainer
     private void configureBindings()
     {
 
+        System.out.println("Bind");
+
+
+        Arm.getInstance().setDefaultCommand(Arm.getInstance().MoveToPosition());
+
+        operatorController.a().or(operatorController.b()).or(operatorController.x()).whileFalse(Arm.getInstance().rest());
+
+        operatorController.a().whileTrue(Arm.getInstance().cone());
+
+        operatorController.b().whileTrue(Arm.getInstance().cube());
+
+        operatorController.x().whileTrue(Arm.getInstance().floor());
+
+        operatorController.leftBumper().whileFalse(Hand.getInstance().closeHand().repeatedly());
+
+        operatorController.leftBumper().whileTrue(Hand.getInstance().openHand().repeatedly());
+
+        operatorController.rightBumper().whileTrue(Arm.getInstance().toggle());
 
     }
 }

@@ -101,7 +101,6 @@ public class Robot extends TimedRobot
     public void teleopPeriodic() {
 
         CommandScheduler.getInstance().schedule(robotContainer.teleopDrive);
-        CommandScheduler.getInstance().schedule(robotContainer.arm.manual(RobotContainer.driverController.getLeftY(), RobotContainer.driverController.getRightY()));
 
         if(RobotContainer.driverController.getAButton()){
             RobotContainer._navXGyro.resetGyro();

@@ -18,6 +18,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
  */
 public final class Constants
 {
+
+    private  Constants instance;
+
     public static double kPhysicalMaxSpeedMetersPerSecond = 13.0;
 
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
@@ -37,5 +40,11 @@ public final class Constants
     public static class SwerveConstants
     {
         public static final boolean invertDrive = false;
+    }
+
+    public static class ArmConstants
+    {
+        public static final double armRest = 0;
+        public static final double elbowRest = 10;
     }
 }
