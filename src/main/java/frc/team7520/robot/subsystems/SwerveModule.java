@@ -44,7 +44,7 @@ public class SwerveModule extends SubsystemBase {
 
     private RelativeEncoder driveMotorEncoder; //Set up integrated Drive motor encoder in Spark Max/Neo
 
-    private static final double STEER_P = 3.0, STEER_I = 0.0, STEER_D = 0.1;
+    private static final double STEER_P = 3.0, STEER_I = 0.05, STEER_D = 0.1, STEER_F = 0.05;
     private static final int STATUS_FRAME_PERIOD = 5;
     public double encoderCountPerRotation = 5278770d/3179;
 
@@ -72,9 +72,10 @@ public class SwerveModule extends SubsystemBase {
         this.steerMotor.config_kP(0, STEER_P, 0);
         this.steerMotor.config_kI(0, STEER_I, 0);
         this.steerMotor.config_kD(0, STEER_D, 0);
+        this.steerMotor.config_kF(0, STEER_F, 0);
         this.steerMotor.config_IntegralZone(0, 100, 0);
-        this.steerMotor.configAllowableClosedloopError(0, 2, 0);
-        this.steerMotor.setNeutralMode(NeutralMode.Coast);
+        this.steerMotor.configAllowableClosedloopError(0, 0, 0);
+        this.steerMotor.setNeutralMode(NeutralMode.Brake);
         this.steerMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, STATUS_FRAME_PERIOD, 0);
         this.steerMotor.setSensorPhase(true);
 //        this.steerMotor.setSelectedSensorPosition(0);
@@ -138,7 +139,7 @@ public class SwerveModule extends SubsystemBase {
         //steerOutput = MathUtil.clamp(steerOutput, -1, 1); // Use for RoboRio PID
 
 
-        driveMotor.set(speed*1);
+        driveMotor.set(speed*0.3);
         steerMotor.set(ControlMode.Position, targetPosition);
 
 

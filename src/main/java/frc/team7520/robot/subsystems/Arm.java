@@ -2,13 +2,11 @@ package frc.team7520.robot.subsystems;
 
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.team7520.robot.RobotContainer;
 
 public class Arm extends SubsystemBase {
@@ -24,9 +22,21 @@ public class Arm extends SubsystemBase {
     private RelativeEncoder elbowEncoder;
     private RelativeEncoder armEncoder;
 
-    private double armPos = 0;
+    Position currentPosition = Position.REST;
 
-    private double elbowPos = 0;
+    enum Position {
+        FLOOR(0, 90),
+        CUBE(-92, 65),
+        CONE(-105, 55),
+        REST(0,0);
+
+        public int arm;
+        public int elbow;
+        Position(int arm, int elbow) {
+            this.arm = arm;
+            this.elbow = elbow;
+        }
+    }
 
 
 
@@ -58,9 +68,9 @@ public class Arm extends SubsystemBase {
      */
     private Arm() {
         this.elbowEncoder = elbowMotor.getEncoder();
-        this.elbowEncoder.setPosition(0);
+//        this.elbowEncoder.setPosition(0);
         this.armEncoder = armMotor.getEncoder();
-        this.armEncoder.setPosition(0);
+//        this.armEncoder.setPosition(0);
 
         this.armPID = armMotor.getPIDController();
         this.elbowPID = elbowMotor.getPIDController();
@@ -76,7 +86,7 @@ public class Arm extends SubsystemBase {
         armPID.setP(1);
         armPID.setI(0);
         armPID.setD(0);
-        armPID.setFF(.1);
+        armPID.setFF(0);
 
         elbowPID.setOutputRange(-1,0.1);
         armPID.setOutputRange(-1,1);
@@ -85,26 +95,26 @@ public class Arm extends SubsystemBase {
 
     public Command cube() {
         return runOnce( () -> {
-            setPosition(-92, 65);
-        }).andThen(MoveToPosition());
+            setPosition(Position.CUBE);
+        }).andThen(moveArm());
     }
 
     public Command cone() {
         return runOnce( () -> {
-            setPosition(-105, 55);
-        }).andThen(MoveToPosition());
+            setPosition(Position.CONE);
+        }).andThen(moveArm());
     }
 
     public Command floor(){
         return runOnce( () -> {
-            setPosition(0, 95);
+            setPosition(Position.FLOOR);
         });
     }
 
     public Command rest() {
         return runOnce( () -> {
-            setPosition(0, 0);
-        }).andThen(MoveToPosition());
+            setPosition(Position.REST);
+        }).andThen(moveArm());
     }
 
     boolean idleMode = false;
@@ -189,16 +199,39 @@ public class Arm extends SubsystemBase {
 //          });
 //    }
 
-    public void setPosition(double arm, double elbow){
-        armPos = arm;
-        elbowPos = elbow;
+    public void setPosition(Position position){
+
+        currentPosition = position;
+
     }
 
-    public CommandBase MoveToPosition() { //Auto positioning
+    public Command changePos(double arm, double elbow){
+        return runOnce(() ->{
+           if(Math.abs(elbow)>=0.95){
+               if(elbow < 0){
+                   Position.valueOf(currentPosition.name()).elbow =  Position.valueOf(currentPosition.name()).elbow - 1;
+               }else {
+                   Position.valueOf(currentPosition.name()).elbow =  Position.valueOf(currentPosition.name()).elbow + 1;
+               }
 
-        return runOnce( () -> {
-            armPID.setReference(armPos, CANSparkMax.ControlType.kPosition);
-            elbowPID.setReference(elbowPos, CANSparkMax.ControlType.kPosition);
+               if(Math.abs(arm)>=0.95){
+                   if(arm < 0){
+                       Position.valueOf(currentPosition.name()).arm =  Position.valueOf(currentPosition.name()).arm - 1;
+                   }else {
+                       Position.valueOf(currentPosition.name()).arm =  Position.valueOf(currentPosition.name()).arm + 1;
+                   }
+               }
+
+           }
+        }).andThen(moveArm());
+
+    }
+
+    public Command moveArm() { //Auto positioning
+        return runOnce(() -> {
+
+            armPID.setReference(currentPosition.arm, CANSparkMax.ControlType.kPosition);
+            elbowPID.setReference(currentPosition.elbow, CANSparkMax.ControlType.kPosition);
         });
 
     }

@@ -5,8 +5,12 @@
 
 package frc.team7520.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.team7520.robot.Constants.OperatorConstants;
 import frc.team7520.robot.commands.TeleopDrive;
@@ -45,9 +49,19 @@ public class RobotContainer
     // Replace with CommandPS4Controller or CommandJoystick if needed
     public static final XboxController driverController =
             new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
-    public final CommandXboxController operatorController =
-            new CommandXboxController(OperatorConstants.OPERATOR_CONTROLLER_PORT);
+    public final XboxController operatorController =
+            new XboxController(OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
+    JoystickButton operatorLeftBumper = new JoystickButton(operatorController, Button.kLeftBumper.value);
+    JoystickButton operatorRightModifier = new JoystickButton(operatorController, Button.kStart.value);
+    JoystickButton operatorLeftModifier = new JoystickButton(operatorController, Button.kBack.value);
+    JoystickButton operatorRightBumper = new JoystickButton(operatorController, Button.kRightBumper.value);
+    JoystickButton operatorYButton = new JoystickButton(operatorController, Button.kY.value);
+    JoystickButton operatorAButton = new JoystickButton(operatorController, Button.kA.value);
+    JoystickButton operatorBButton = new JoystickButton(operatorController, Button.kB.value);
+    JoystickButton operatorXButton = new JoystickButton(operatorController, Button.kX.value);
+
+    public static Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer()
     {
@@ -70,22 +84,17 @@ public class RobotContainer
 
         System.out.println("Bind");
 
+        Hand.getInstance().setDefaultCommand(Hand.getInstance().closeHand());
+        Arm.getInstance().setDefaultCommand(Arm.getInstance().moveArm());
 
-        Arm.getInstance().setDefaultCommand(Arm.getInstance().MoveToPosition());
+        operatorYButton.whileTrue(Arm.getInstance().rest());
+        operatorAButton.whileTrue(Arm.getInstance().cone());
+        operatorBButton.whileTrue(Arm.getInstance().cube());
+        operatorXButton.whileTrue(Arm.getInstance().floor());
 
-        operatorController.a().or(operatorController.b()).or(operatorController.x()).whileFalse(Arm.getInstance().rest());
+        operatorLeftBumper.whileTrue(Hand.getInstance().openHand().repeatedly());
 
-        operatorController.a().whileTrue(Arm.getInstance().cone());
-
-        operatorController.b().whileTrue(Arm.getInstance().cube());
-
-        operatorController.x().whileTrue(Arm.getInstance().floor());
-
-        operatorController.leftBumper().whileFalse(Hand.getInstance().closeHand().repeatedly());
-
-        operatorController.leftBumper().whileTrue(Hand.getInstance().openHand().repeatedly());
-
-        operatorController.rightBumper().whileTrue(Arm.getInstance().toggle());
+        operatorRightBumper.whileTrue(Arm.getInstance().toggle());
 
     }
 }
