@@ -1,13 +1,14 @@
 package frc.team7520.robot.subsystems;
 
 import com.revrobotics.SparkMaxPIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.smartdashboard.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.team7520.robot.RobotContainer;
+import static frc.team7520.robot.RobotContainer.*;
 
 public class Arm extends SubsystemBase {
 
@@ -25,15 +26,15 @@ public class Arm extends SubsystemBase {
     Position currentPosition = Position.REST;
 
     enum Position {
-        FLOOR(0, 100),
+        FLOOR(0, 28.6),
         CUBE(-87, 69),
-        CONE(-105, 57),
+        CONE(-103, 65),
         DUNK(-103, 70),
         REST(0,0);
 
-        public int arm;
-        public int elbow;
-        Position(int arm, int elbow) {
+        public double arm;
+        public double elbow;
+        Position(double arm, double elbow) {
             this.arm = arm;
             this.elbow = elbow;
         }
@@ -87,7 +88,7 @@ public class Arm extends SubsystemBase {
         armPID.setP(1);
         armPID.setI(0);
         armPID.setD(0);
-        armPID.setFF(0);
+        armPID.setFF(0.1);
 
         elbowPID.setOutputRange(-0.5,0.25);
         armPID.setOutputRange(-1,1);
@@ -215,24 +216,27 @@ public class Arm extends SubsystemBase {
 
     }
 
-    public Command changePos(double arm, double elbow){
+    public Command changePos(){
+
         return runOnce(() ->{
-           if(Math.abs(elbow)>=0.95){
-               if(elbow < 0){
-                   Position.valueOf(currentPosition.name()).elbow =  Position.valueOf(currentPosition.name()).elbow - 1;
-               }else {
-                   Position.valueOf(currentPosition.name()).elbow =  Position.valueOf(currentPosition.name()).elbow + 1;
-               }
 
-               if(Math.abs(arm)>=0.95){
-                   if(arm < 0){
-                       Position.valueOf(currentPosition.name()).arm =  Position.valueOf(currentPosition.name()).arm - 1;
-                   }else {
-                       Position.valueOf(currentPosition.name()).arm =  Position.valueOf(currentPosition.name()).arm + 1;
-                   }
-               }
+            double elbow = operatorController.getRightY();
+            double arm = operatorController.getLeftY();
 
-           }
+            System.out.println(Math.abs(arm));
+
+            if(Math.abs(arm) > 0.05){
+                System.out.println(arm);
+
+                currentPosition.arm = currentPosition.arm + 1 * arm;
+            }
+
+            if(Math.abs(elbow) > 0.05){
+
+                System.out.println(elbow);
+                currentPosition.elbow =  currentPosition.elbow - 1 * elbow;
+            }
+
         }).andThen(moveArm());
 
     }
@@ -248,16 +252,11 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-//
-//        double elbowPosition = elbowEncoder.getPosition();
-//        double elbowSpeed = elbowEncoder.getVelocity();
-//        SmartDashboard.putNumber("ForeArm Position", elbowPosition);
-//        SmartDashboard.putNumber("ForeArm Speed", elbowSpeed);
-//
-//        double shoulderPosition = armEncoder.getPosition();
-//        double shoulderSpeed = armEncoder.getVelocity();
-//        SmartDashboard.putNumber("Arm Position", shoulderPosition);
-//        SmartDashboard.putNumber("Arm Speed", shoulderSpeed);
+
+        SmartDashboard.putNumber("arm", armEncoder.getPosition());
+        SmartDashboard.putNumber("Elbow", elbowEncoder.getPosition());
+
+
 
     }
 }

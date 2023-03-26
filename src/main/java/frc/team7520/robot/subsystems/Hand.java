@@ -1,10 +1,15 @@
 package frc.team7520.robot.subsystems;
 
 
+import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static frc.team7520.robot.RobotContainer.compressor;
 
 public class Hand extends SubsystemBase {
 
@@ -29,7 +34,11 @@ public class Hand extends SubsystemBase {
         return INSTANCE;
     }
 
-    DoubleSolenoid solenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 1);
+    boolean isCompressed = false;
+
+    DoubleSolenoid solenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 8, 9);
+
+    ColorSensorV3 colorSensorV3 = new ColorSensorV3(I2C.Port.kOnboard);
 
     /**
      * Creates a new instance of this Hand. This constructor
@@ -52,8 +61,33 @@ public class Hand extends SubsystemBase {
         });
     }
 
+    public Command autoClose(){
+        return runOnce( () -> {
+            if (colorSensorV3.getProximity() > 2000){
+                solenoid.set(DoubleSolenoid.Value.kForward);
+            }
+        });
+    }
+
     @Override
     public void periodic() {
+
+        if(compressor.getPressure() < 109 && !isCompressed){
+            compressor.enableAnalog(110,111);
+        }else {
+            if(!isCompressed) {
+                isCompressed = true;
+                compressor.enableAnalog(70,80);
+            };
+        }
+
+        SmartDashboard.putBoolean("e", isCompressed);
+
+        SmartDashboard.putNumber("ee", compressor.getPressure());
+
+        SmartDashboard.putBoolean("eee", compressor.getPressure() > 119);
+
+
     }
 }
 

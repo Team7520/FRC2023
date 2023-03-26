@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -19,7 +20,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.DigitalInput;
 
-
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
 
 /**
@@ -30,9 +31,11 @@ import edu.wpi.first.wpilibj.DigitalInput;
  */
 public class RobotContainer
 {
+
+    public static boolean speedCutoff = false;
     public static final SwerveModule swerve1 = new SwerveModule(1, 11, Constants.SwerveConstants.invertDrive, false);
     public static final SwerveModule swerve2 = new SwerveModule(2, 12, Constants.SwerveConstants.invertDrive, true);
-    public static final SwerveModule swerve3 = new SwerveModule(3, 13, Constants.SwerveConstants.invertDrive, false);
+    public static final SwerveModule swerve3 = new SwerveModule(3, 13, Constants.SwerveConstants.invertDrive, true);
     public static final SwerveModule swerve4 = new SwerveModule(4, 14, Constants.SwerveConstants.invertDrive, false);
     public static final CANSparkMax armMotor = new CANSparkMax(40,CANSparkMaxLowLevel.MotorType.kBrushless);
     public static final CANSparkMax elbowMotor = new CANSparkMax(41,CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -46,7 +49,7 @@ public class RobotContainer
     // Replace with CommandPS4Controller or CommandJoystick if needed
     public static final XboxController driverController =
             new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
-    public final XboxController operatorController =
+    public static final XboxController operatorController =
             new XboxController(OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
     JoystickButton operatorLeftBumper = new JoystickButton(operatorController, Button.kLeftBumper.value);
@@ -63,7 +66,7 @@ public class RobotContainer
     JoystickButton driverBButton = new JoystickButton(driverController, Button.kB.value);
     JoystickButton driverXButton = new JoystickButton(driverController, Button.kX.value);
 
-    public static Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
+    public static Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer()
     {
@@ -86,7 +89,7 @@ public class RobotContainer
 
         System.out.println("Bind");
 
-        Arm.getInstance().setDefaultCommand(Arm.getInstance().moveArm());
+        Arm.getInstance().setDefaultCommand(Arm.getInstance().changePos());
 
         operatorYButton.whileTrue(Arm.getInstance().rest());
         operatorAButton.whileTrue(Arm.getInstance().cone());
@@ -94,8 +97,14 @@ public class RobotContainer
         operatorXButton.whileTrue(Arm.getInstance().floor());
 
         operatorLeftBumper.whileTrue(Hand.getInstance().openHand().repeatedly());
+        operatorRightBumper.whileTrue(Hand.getInstance().closeHand().repeatedly());
 
-        driverBButton.whileTrue(SwerveBase.getInstance().lock());
+        driverBButton.whileTrue( runOnce( () -> {
+            speedCutoff = !speedCutoff;
+            SmartDashboard.putBoolean("Speed Cutoff",speedCutoff);
+        }));
+
+//        driverBButton.whileTrue(SwerveBase.getInstance().lock());
 
 //        operatorRightBumper.whileTrue(Arm.getInstance().toggle());
 

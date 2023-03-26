@@ -26,6 +26,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.team7520.robot.Robot;
 
+import static frc.team7520.robot.RobotContainer.speedCutoff;
+
+
 //import frc.robot.subsystems.setSwerveModule;
 
 public class SwerveModule extends SubsystemBase {
@@ -139,7 +142,7 @@ public class SwerveModule extends SubsystemBase {
         //steerOutput = MathUtil.clamp(steerOutput, -1, 1); // Use for RoboRio PID
 
 
-        driveMotor.set(speed*0.5);
+        driveMotor.set(speed * 1 * (speedCutoff ? 0.5 : 1));
         steerMotor.set(ControlMode.Position, targetPosition);
 
 

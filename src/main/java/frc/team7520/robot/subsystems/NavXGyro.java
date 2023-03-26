@@ -4,12 +4,16 @@
 
 package frc.team7520.robot.subsystems;
 
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.SPI;
+
+import static frc.team7520.robot.RobotContainer.*;
 
 public class NavXGyro extends SubsystemBase {
 
@@ -78,6 +82,26 @@ public class NavXGyro extends SubsystemBase {
 
     public void resetGyro(){
         navX.reset();
+    }
+
+
+
+    double navXGs;
+
+
+    @Override
+    public void periodic(){
+
+//        navXGs = Math.sqrt( (navX.getRawAccelX() * navX.getRawAccelX()) + (navX.getRawAccelY() * navX.getRawAccelY()) + (navX.getRawAccelZ() - 9.8 * navX.getRawAccelZ() - 9.8) );
+//
+//        SmartDashboard.putNumber("accel gs", navXGs);
+//
+//        if(navXGs > 1){
+//
+//            driverController.setRumble(GenericHID.RumbleType.kBothRumble, 1);
+//
+//        }else {
+
     }
 
 }
