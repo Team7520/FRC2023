@@ -1,62 +1,91 @@
-//package frc.team7520.robot.autos;
-//
-//import com.pathplanner.lib.auto.SwerveAutoBuilder;
-//import edu.wpi.first.wpilibj2.command.Command;
-//import edu.wpi.first.wpilibj2.command.CommandBase;
-//import edu.wpi.first.wpilibj2.command.PrintCommand;
-//import frc.team7520.robot.RobotContainer;
-//
-//import java.util.HashMap;
-//
-//
-//public class ChargeCommand extends CommandBase {
-//
-//    public ChargeCommand() {
-//        // each subsystem used by the command must be passed into the
-//        // addRequirements() method (which takes a vararg of Subsystem)
-//        addRequirements();
-//    }
-//
-//    @Override
-//    public void initialize() {
-//
-//        // This will load the file "FullAuto.path" and generate it with a max velocity of 4 m/s and a max acceleration of 3 m/s^2
-//// for every path in the group
-//        ArrayList<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("FullAuto", new PathConstraints(4, 3));
-//
-//// This is just an example event map. It would be better to have a constant, global event map
-//// in your code that will be used by all path following commands.
-//        HashMap<String, Command> eventMap = new HashMap<>();
-//        eventMap.put("marker1", new PrintCommand("Passed marker 1"));
-//
-//// Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.
-//        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-//                RobotContainer.swerveBase::getPose, // Pose2d supplier
-//                RobotContainer.swerveBase::resetPose, // Pose2d consumer, used to reset odometry at the beginning of auto
-//                RobotContainer.swerveBase.kinematics, // SwerveDriveKinematics
-//                new PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-//                new PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-//                RobotContainer.swerveBase::setModuleStates, // Module states consumer used to output to the drive subsystem
-//                eventMap,
-//                true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-//                RobotContainer.swerveBase // The drive subsystem. Used to properly set the requirements of path following commands
-//        );
-//
-//    }
-//
-//    @Override
-//    public void execute() {
-//
-//    }
-//
-//    @Override
-//    public boolean isFinished() {
-//        // TODO: Make this return true when this Command no longer needs to run execute()
-//        return false;
-//    }
-//
-//    @Override
-//    public void end(boolean interrupted) {
-//
-//    }
-//}
+package frc.team7520.robot.autos;
+
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.team7520.robot.RobotContainer;
+import frc.team7520.robot.subsystems.SwerveBase;
+
+
+public class ChargeCommand extends CommandBase {
+
+    public ChargeCommand() {
+        // each subsystem used by the command must be passed into the
+        // addRequirements() method (which takes a vararg of Subsystem)
+        addRequirements();
+    }
+
+    @Override
+    public void initialize() {
+
+        RobotContainer.swerve1.resetEncoders();
+        RobotContainer.swerve2.resetEncoders();
+        RobotContainer.swerve3.resetEncoders();
+        RobotContainer.swerve4.resetEncoders();
+
+        SwerveBase swerveBase = SwerveBase.getInstance();
+
+        SwerveModuleState swerveModuleState = new SwerveModuleState();
+
+        swerveBase.setModuleStates(new SwerveModuleState[]{swerveModuleState, swerveModuleState, swerveModuleState, swerveModuleState});
+
+    }
+
+    @Override
+    public void execute() {
+
+        RobotContainer.swerve1.setSwerve(0,0,false);
+        RobotContainer.swerve2.setSwerve(0,0,false);
+        RobotContainer.swerve3.setSwerve(0,0,false);
+        RobotContainer.swerve4.setSwerve(0,0,false);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        double distance = .2;
+
+        RobotContainer.swerve1.driveMotor.set(distance);/*.setReference(distance, CANSparkMax.ControlType.kPosition);*/
+        RobotContainer.swerve2.driveMotor.set(distance);/*.setReference(distance, CANSparkMax.ControlType.kPosition);*/
+        RobotContainer.swerve3.driveMotor.set(distance);/*.setReference(distance, CANSparkMax.ControlType.kPosition);*/
+        RobotContainer.swerve4.driveMotor.set(distance);/*.setReference(distance, CANSparkMax.ControlType.kPosition);*/
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        distance = .5;
+
+        RobotContainer.swerve1.driveMotor.set(distance);/*.setReference(distance, CANSparkMax.ControlType.kPosition);*/
+        RobotContainer.swerve2.driveMotor.set(distance);/*.setReference(distance, CANSparkMax.ControlType.kPosition);*/
+        RobotContainer.swerve3.driveMotor.set(distance);/*.setReference(distance, CANSparkMax.ControlType.kPosition);*/
+        RobotContainer.swerve4.driveMotor.set(distance);/*.setReference(distance, CANSparkMax.ControlType.kPosition);*/
+
+        try {
+            Thread.sleep(1950);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        RobotContainer.swerve1.setSwerve(315,0,true);
+        RobotContainer.swerve2.setSwerve(225,0,true);
+        RobotContainer.swerve3.setSwerve(135,0,true);
+        RobotContainer.swerve4.setSwerve(45,0,true);
+
+    }
+
+    @Override
+    public boolean isFinished() {
+        // TODO: Make this return true when this Command no longer needs to run execute()
+        return true;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+
+    }
+}

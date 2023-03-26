@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team7520.robot.Constants;
 
@@ -54,9 +55,11 @@ public class SwerveBase extends SubsystemBase {
     private NavXGyro _gyro;
     private boolean _driveCorrect;
 
-    private ShuffleboardTab driveTab = Shuffleboard.getTab("DriveTab");
+//    private ShuffleboardTab driveTab = Shuffleboard.getTab("DriveTab");
 
     private SwerveDriveOdometry odometer;
+
+    private boolean lock = false;
 
 
     //SwerveModule(int steerNum, int driveNum, boolean invertDrive, boolean invertSteer)
@@ -138,21 +141,21 @@ public class SwerveBase extends SubsystemBase {
         swerve4.setDriveSpeed(speed);
     }
 
-    GenericEntry lfSetAngle = driveTab.addPersistent("LF Set Angle", 0)
-            .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -180, "max", 180, "center", 0))
-            .withPosition(0, 0).withSize(3, 1).getEntry();
-
-    GenericEntry lbSetAngle = driveTab.addPersistent("LB Set Angle", 0)
-            .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -180, "max", 180, "center", 0))
-            .withPosition(0, 1).withSize(3, 1).getEntry();
-
-    GenericEntry rfSetAngle = driveTab.addPersistent("RF Set Angle", 0)
-            .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -180, "max", 180, "center", 0))
-            .withPosition(4, 0).withSize(3, 1).getEntry();
-
-    GenericEntry rbSetAngle = driveTab.addPersistent("RBack Set Angle", 0)
-            .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -180, "max", 180, "center", 0))
-            .withPosition(4, 2).withSize(3, 1).getEntry();
+//    GenericEntry lfSetAngle = driveTab.addPersistent("LF Set Angle", 0)
+//            .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -180, "max", 180, "center", 0))
+//            .withPosition(0, 0).withSize(3, 1).getEntry();
+//
+//    GenericEntry lbSetAngle = driveTab.addPersistent("LB Set Angle", 0)
+//            .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -180, "max", 180, "center", 0))
+//            .withPosition(0, 1).withSize(3, 1).getEntry();
+//
+//    GenericEntry rfSetAngle = driveTab.addPersistent("RF Set Angle", 0)
+//            .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -180, "max", 180, "center", 0))
+//            .withPosition(4, 0).withSize(3, 1).getEntry();
+//
+//    GenericEntry rbSetAngle = driveTab.addPersistent("RBack Set Angle", 0)
+//            .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -180, "max", 180, "center", 0))
+//            .withPosition(4, 2).withSize(3, 1).getEntry();
 
     public void processInput(double forward, double strafe, double omega, boolean deadStick, boolean driveCorrect) {
 
@@ -185,10 +188,10 @@ public class SwerveBase extends SubsystemBase {
          * encoder to zero.
          */
 
-        double lfOffset = lfSetAngle.getDouble(0.0);
-        double lbOffset = lbSetAngle.getDouble(0.0);
-        double rfOffset = rfSetAngle.getDouble(0.0);
-        double rbOffset = rbSetAngle.getDouble(0.0);
+//        double lfOffset = lfSetAngle.getDouble(0.0);
+//        double lbOffset = lbSetAngle.getDouble(0.0);
+//        double rfOffset = rfSetAngle.getDouble(0.0);
+//        double rbOffset = rbSetAngle.getDouble(0.0);
 
 
         // Compute the drive motor speeds
@@ -220,6 +223,13 @@ public class SwerveBase extends SubsystemBase {
         // Set each swerve module, scaling the drive speeds by the maximum speed
 
         if (deadStick) {
+
+            if(lock){
+                swerve4.setSwerve(45, 0, false);
+                swerve3.setSwerve(45 + 90, 0, false);
+                swerve2.setSwerve(45 + 180, 0, false);
+                swerve1.setSwerve(45 - 90, 0, false);
+            }
 
             swerve1.stop();
             swerve2.stop();
@@ -284,8 +294,8 @@ public class SwerveBase extends SubsystemBase {
     public void periodic() {
 
         odometer.update(this._gyro.getRotation2d(), getModulePositions());
-        SmartDashboard.putNumber("Robot Heading", this._gyro.getHeading());
-        SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+//        SmartDashboard.putNumber("Robot Heading", this._gyro.getHeading());
+//        SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
         //******** */
         // Uncomment following line to physically reset encoders position to zero state.
         // getSteerEncoderVal();
@@ -335,5 +345,11 @@ public class SwerveBase extends SubsystemBase {
             swerve2.getState(),
             swerve4.getState()
         };
+    }
+
+    public Command lock(){
+        return runOnce( () -> {
+            lock = !lock;
+        });
     }
 }
