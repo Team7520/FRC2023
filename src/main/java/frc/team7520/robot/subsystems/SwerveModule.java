@@ -139,7 +139,7 @@ public class SwerveModule extends SubsystemBase {
         //steerOutput = MathUtil.clamp(steerOutput, -1, 1); // Use for RoboRio PID
 
 
-        driveMotor.set(speed*0.3);
+        driveMotor.set(speed*0.5);
         steerMotor.set(ControlMode.Position, targetPosition);
 
 
@@ -239,6 +239,10 @@ public class SwerveModule extends SubsystemBase {
 
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(getDriveEncoder(), getTurningPosition());
+    }
+
+    public void lock(){
+
     }
 
     @Override

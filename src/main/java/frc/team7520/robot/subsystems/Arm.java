@@ -25,9 +25,10 @@ public class Arm extends SubsystemBase {
     Position currentPosition = Position.REST;
 
     enum Position {
-        FLOOR(0, 90),
-        CUBE(-92, 65),
-        CONE(-105, 55),
+        FLOOR(0, 100),
+        CUBE(-87, 69),
+        CONE(-105, 57),
+        DUNK(-103, 70),
         REST(0,0);
 
         public int arm;
@@ -88,9 +89,18 @@ public class Arm extends SubsystemBase {
         armPID.setD(0);
         armPID.setFF(0);
 
-        elbowPID.setOutputRange(-1,0.1);
+        elbowPID.setOutputRange(-0.5,0.25);
         armPID.setOutputRange(-1,1);
 
+        elbowMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+    }
+
+    public Command dunk(){
+        return runOnce( () -> {
+            setPosition(Position.DUNK);
+        });
     }
 
     public Command cube() {
@@ -119,19 +129,19 @@ public class Arm extends SubsystemBase {
 
     boolean idleMode = false;
 
-    public Command toggle(){
-        return runOnce(() -> {
-            idleMode = !idleMode;
-
-            if(idleMode){
-                elbowMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
-                armMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
-            }else{
-                elbowMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-            }
-        });
-    }
+//    public Command toggle(){
+//        return runOnce(() -> {
+//            idleMode = !idleMode;
+//
+//            if(idleMode){
+//                elbowMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+//                armMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+//            }else{
+//                elbowMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+//                armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+//            }
+//        });
+//    }
 
     // public boolean floor() {
     //     boolean complete;
@@ -238,16 +248,16 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        double elbowPosition = elbowEncoder.getPosition();
-        double elbowSpeed = elbowEncoder.getVelocity();
-        SmartDashboard.putNumber("ForeArm Position", elbowPosition);
-        SmartDashboard.putNumber("ForeArm Speed", elbowSpeed);
-
-        double shoulderPosition = armEncoder.getPosition();
-        double shoulderSpeed = armEncoder.getVelocity();
-        SmartDashboard.putNumber("Arm Position", shoulderPosition);
-        SmartDashboard.putNumber("Arm Speed", shoulderSpeed);
+//
+//        double elbowPosition = elbowEncoder.getPosition();
+//        double elbowSpeed = elbowEncoder.getVelocity();
+//        SmartDashboard.putNumber("ForeArm Position", elbowPosition);
+//        SmartDashboard.putNumber("ForeArm Speed", elbowSpeed);
+//
+//        double shoulderPosition = armEncoder.getPosition();
+//        double shoulderSpeed = armEncoder.getVelocity();
+//        SmartDashboard.putNumber("Arm Position", shoulderPosition);
+//        SmartDashboard.putNumber("Arm Speed", shoulderSpeed);
 
     }
 }

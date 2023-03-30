@@ -14,10 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.team7520.robot.Constants.OperatorConstants;
 import frc.team7520.robot.commands.TeleopDrive;
-import frc.team7520.robot.subsystems.Arm;
-import frc.team7520.robot.subsystems.Hand;
-import frc.team7520.robot.subsystems.NavXGyro;
-import frc.team7520.robot.subsystems.SwerveModule;
+import frc.team7520.robot.subsystems.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -61,6 +58,11 @@ public class RobotContainer
     JoystickButton operatorBButton = new JoystickButton(operatorController, Button.kB.value);
     JoystickButton operatorXButton = new JoystickButton(operatorController, Button.kX.value);
 
+    JoystickButton driverYButton = new JoystickButton(driverController, Button.kY.value);
+    JoystickButton driverAButton = new JoystickButton(driverController, Button.kA.value);
+    JoystickButton driverBButton = new JoystickButton(driverController, Button.kB.value);
+    JoystickButton driverXButton = new JoystickButton(driverController, Button.kX.value);
+
     public static Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer()
@@ -84,7 +86,6 @@ public class RobotContainer
 
         System.out.println("Bind");
 
-        Hand.getInstance().setDefaultCommand(Hand.getInstance().closeHand());
         Arm.getInstance().setDefaultCommand(Arm.getInstance().moveArm());
 
         operatorYButton.whileTrue(Arm.getInstance().rest());
@@ -94,7 +95,9 @@ public class RobotContainer
 
         operatorLeftBumper.whileTrue(Hand.getInstance().openHand().repeatedly());
 
-        operatorRightBumper.whileTrue(Arm.getInstance().toggle());
+        driverBButton.whileTrue(SwerveBase.getInstance().lock());
+
+//        operatorRightBumper.whileTrue(Arm.getInstance().toggle());
 
     }
 }

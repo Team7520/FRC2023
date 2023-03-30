@@ -5,11 +5,22 @@
 
 package frc.team7520.robot;
 
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.team7520.robot.autos.MoveBackAprilTagCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.team7520.robot.autos.ChargeCommand;
 import frc.team7520.robot.autos.MoveBackCommand;
+import frc.team7520.robot.autos.PlaceConeCommand;
+import frc.team7520.robot.subsystems.Arm;
+import frc.team7520.robot.subsystems.Hand;
+import edu.wpi.first.cameraserver.CameraServer;
+
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
 
 /**
@@ -28,14 +39,25 @@ public class Robot extends TimedRobot
      * This method is run when the robot is first started up and should be used for any
      * initialization code.
      */
+
+    SendableChooser<Boolean> ShouldBackUp;
     @Override
     public void robotInit()
     {
+        CameraServer.startAutomaticCapture();
+
+        ShouldBackUp = new SendableChooser<>();
+
+        ShouldBackUp.setDefaultOption("yes", true);
+        ShouldBackUp.addOption("no", false);
+
         // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         // autonomous chooser on the dashboard.
         robotContainer = new RobotContainer();
 
         RobotContainer.compressor.enableDigital();
+
+        SmartDashboard.putData("Should Back Up", ShouldBackUp);
     }
 
 
@@ -64,16 +86,23 @@ public class Robot extends TimedRobot
 
     @Override
     public void disabledPeriodic() {}
-
-    MoveBackCommand moveBackCommand = new MoveBackCommand();
-    MoveBackAprilTagCommand moveBackAprilTagCommand = new MoveBackAprilTagCommand(1);
+    SequentialCommandGroup placeConeCommand;
+    ChargeCommand chargeCommand = new ChargeCommand();
+    MoveBackCommand moveBackCommand = new MoveBackCommand(1);
 
 
     /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
     @Override
     public void autonomousInit()
-    {;
-        moveBackCommand.schedule();
+    {
+
+        placeConeCommand = Arm.getInstance().cone().andThen(new PlaceConeCommand()).andThen(Arm.getInstance().dunk()).andThen(Hand.getInstance().openHand()).andThen(new WaitCommand(1)).andThen(Arm.getInstance().rest()).andThen(ShouldBackUp.getSelected() ? new MoveBackCommand(1) : runOnce(() ->{}));
+
+//        if(ShouldBackUp.getSelected()){
+//            placeConeCommand.andThen(moveBackCommand);
+//        }
+
+        placeConeCommand.schedule();
     }
 
 
@@ -91,10 +120,12 @@ public class Robot extends TimedRobot
         // teleop starts running. If you want the autonomous to
         // continue until interrupted by another command, remove
         // this line or comment it out.
-        if (moveBackCommand != null)
+        if (placeConeCommand != null)
         {
-            moveBackCommand.cancel();
+            placeConeCommand.cancel();
         }
+
+        Hand.getInstance().setDefaultCommand(Hand.getInstance().closeHand());
     }
 
 
