@@ -28,7 +28,7 @@ public class Arm extends SubsystemBase {
     enum Position {
         FLOOR(0, 28.6),
         CUBE(-87, 69),
-        CONE(-103, 65),
+        CONE(-100, 65),
         DUNK(-103, 70),
         REST(0,0);
 

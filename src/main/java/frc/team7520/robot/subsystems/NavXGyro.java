@@ -92,15 +92,17 @@ public class NavXGyro extends SubsystemBase {
     @Override
     public void periodic(){
 
-//        navXGs = Math.sqrt( (navX.getRawAccelX() * navX.getRawAccelX()) + (navX.getRawAccelY() * navX.getRawAccelY()) + (navX.getRawAccelZ() - 9.8 * navX.getRawAccelZ() - 9.8) );
-//
-//        SmartDashboard.putNumber("accel gs", navXGs);
-//
-//        if(navXGs > 1){
-//
-//            driverController.setRumble(GenericHID.RumbleType.kBothRumble, 1);
-//
-//        }else {
+        navXGs = Math.sqrt( (navX.getRawAccelX() * navX.getRawAccelX()) + (navX.getRawAccelY() * navX.getRawAccelY()) + (navX.getRawAccelZ() - 9.8 * navX.getRawAccelZ() - 9.8) );
+
+        SmartDashboard.putNumber("accel gs", navXGs);
+
+        if(navXGs > 1){
+
+            driverController.setRumble(GenericHID.RumbleType.kBothRumble, 1);
+
+        }else {
+            driverController.setRumble(GenericHID.RumbleType.kBothRumble, 0);
+        }
 
     }
 

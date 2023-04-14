@@ -39,7 +39,7 @@ public class PlaceConeCommand extends CommandBase {
         RelativeEncoder armEncoder = armMotor.getEncoder();
         RelativeEncoder elbowEncoder = elbowMotor.getEncoder();
 
-        if (armEncoder.getPosition() < -100 && armEncoder.getPosition() > -105 && elbowEncoder.getPosition() > 62 && elbowEncoder.getPosition() < 70){
+        if (armEncoder.getPosition() < -90 && armEncoder.getPosition() > -110 && elbowEncoder.getPosition() > 62 && elbowEncoder.getPosition() < 70){
 
             finished = true;
         }

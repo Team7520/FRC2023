@@ -94,7 +94,7 @@ public class Robot extends TimedRobot
     public void autonomousInit()
     {
 
-        placeConeCommand = Arm.getInstance().cone().andThen(new PlaceConeCommand()).andThen(Arm.getInstance().dunk()).andThen(Hand.getInstance().openHand()).andThen(new WaitCommand(1)).andThen(Arm.getInstance().rest()).andThen(ShouldBackUp.getSelected() ? new MoveBackCommand(1) : runOnce(() ->{}));
+        placeConeCommand = Arm.getInstance().cone().andThen(new PlaceConeCommand()).andThen(Hand.getInstance().openHand()).andThen(new WaitCommand(1)).andThen(Arm.getInstance().rest()).andThen(ShouldBackUp.getSelected() ? new MoveBackCommand(1) : runOnce(() ->{}));
 
 //        if(ShouldBackUp.getSelected()){
 //            placeConeCommand.andThen(moveBackCommand);
