@@ -81,7 +81,7 @@ public class SwerveModule extends SubsystemBase {
         this.steerMotor.setNeutralMode(NeutralMode.Brake);
         this.steerMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, STATUS_FRAME_PERIOD, 0);
         this.steerMotor.setSensorPhase(true);
-//        this.steerMotor.setSelectedSensorPosition(0);
+        this.steerMotor.setSelectedSensorPosition(0);
         this.steerMotor.setInverted(invertSteer);
 
         //Create the built-in motor encoders
@@ -206,6 +206,7 @@ public class SwerveModule extends SubsystemBase {
 
     public void resetEncoders() {
         driveMotorEncoder.setPosition(0);
+        this.steerMotor.setSelectedSensorPosition(0);
     }
 
     public SwerveModuleState getState() {
