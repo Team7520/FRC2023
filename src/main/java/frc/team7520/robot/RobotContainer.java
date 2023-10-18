@@ -33,8 +33,8 @@ public class RobotContainer
 {
 
     public static boolean speedCutoff = false;
-    public static final SwerveModule swerve1 = new SwerveModule(2, 12, false, true);
-    public static final SwerveModule swerve2 = new SwerveModule(4, 14, Constants.SwerveConstants.invertDrive, true);
+    public static final SwerveModule swerve1 = new SwerveModule(2, 12, Constants.SwerveConstants.invertDrive, true);
+    public static final SwerveModule swerve2 = new SwerveModule(4, 14, false, true);
     public static final SwerveModule swerve3 = new SwerveModule(1, 11, false, true);
     public static final SwerveModule swerve4 = new SwerveModule(3, 13, Constants.SwerveConstants.invertDrive, true);
     public static final CANSparkMax armMotor = new CANSparkMax(40,CANSparkMaxLowLevel.MotorType.kBrushless);
